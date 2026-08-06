@@ -1,3 +1,4 @@
+"use client";
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { SanitizedStartPayload, UserResponses, SanitizedSection } from '../types/test';
 
@@ -57,6 +58,8 @@ const TestContext = createContext<TestContextType | undefined>(undefined);
 export const TestProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/tests/';
+  const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080/api/ws/tests/';
   const [payload, setPayload] = useState<SanitizedStartPayload | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -120,7 +123,7 @@ export const TestProvider: React.FC<{
     } finally {
       setIsSubmitting(false);
     }
-  }, [isSubmitting, isCompleted, payload, answers]);
+  }, [isSubmitting, isCompleted, payload, answers, API_BASE_URL]);
 
   // Mount-time Bootstrapper: fetches current active section questions
   useEffect(() => {
@@ -132,7 +135,7 @@ export const TestProvider: React.FC<{
         setError(null);
 
         const activeTestId = localStorage.getItem('activeTestId') || 'aws-sap-c02';
-        const res = await fetch(`http://localhost:8080/api/tests/${activeTestId}/start`);
+        const res = await fetch(`${API_BASE_URL}${activeTestId}/start`);
         if (!res.ok) {
           throw new Error(`CBT backend responded with HTTP status code: ${res.status}`);
         }
@@ -185,8 +188,8 @@ export const TestProvider: React.FC<{
     const connectWebSocket = () => {
       if (isCleanup) return;
 
-      console.log(`[WS] Handshake established: ws://localhost:8080/api/ws/tests/${payload.attemptId}`);
-      const ws = new WebSocket(`ws://localhost:8080/api/ws/tests/${payload.attemptId}`);
+      console.log(`[WS] Handshake established: ${WS_URL}${payload.attemptId}`);
+      const ws = new WebSocket(`${WS_URL}${payload.attemptId}`);
       wsRef.current = ws;
 
       ws.onopen = () => {

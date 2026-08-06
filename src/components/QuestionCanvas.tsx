@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from 'react';
 import { useTest } from '../context/TestContext';
 import { OptionCard } from './OptionCard';
@@ -21,29 +22,21 @@ export const QuestionCanvas: React.FC = () => {
 
   const [localSelectedOption, setLocalSelectedOption] = useState<string | null>(null);
 
-  if (!payload || payload.questions.length === 0) {
-    return (
-      <div className="flex h-64 flex-col items-center justify-center rounded border border-dashed border-gray-300 bg-gray-50 p-4">
-        <HelpCircle className="h-10 w-10 text-gray-400 animate-pulse" />
-        <p className="mt-2 text-xs text-gray-500 font-bold uppercase tracking-wider font-mono">
-          No questions loaded in active section segment.
-        </p>
-      </div>
-    );
-  }
-
-  const currentQuestion = payload.questions[currentQuestionIndex];
+  const currentQuestion = payload?.questions?.[currentQuestionIndex];
 
   // Sync localSelectedOption with answers database sync when index swaps
   useEffect(() => {
-    setLocalSelectedOption(answers[currentQuestion.id] || null);
-  }, [currentQuestionIndex, currentQuestion.id, answers]);
+    if (currentQuestion) {
+      setLocalSelectedOption(answers[currentQuestion.id] || null);
+    }
+  }, [currentQuestionIndex, currentQuestion?.id, answers]);
 
   // Keyboard Shortcuts Hook
   useEffect(() => {
     if (isCompleted || connectionLost || isWaiting) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (!currentQuestion) return;
       if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
         return;
       }
@@ -78,7 +71,19 @@ export const QuestionCanvas: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentQuestionIndex, currentQuestion, localSelectedOption, isCompleted, connectionLost, isWaiting, payload.questions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentQuestionIndex, currentQuestion, localSelectedOption, isCompleted, connectionLost, isWaiting, payload?.questions]);
+
+  if (!payload || payload.questions.length === 0 || !currentQuestion) {
+    return (
+      <div className="flex h-64 flex-col items-center justify-center rounded border border-dashed border-gray-300 bg-gray-50 p-4">
+        <HelpCircle className="h-10 w-10 text-gray-400 animate-pulse" />
+        <p className="mt-2 text-xs text-gray-500 font-bold uppercase tracking-wider font-mono">
+          No questions loaded in active section segment.
+        </p>
+      </div>
+    );
+  }
 
   // Navigation handlers satisfying TCS iON state triggers
   const handleSaveNext = () => {

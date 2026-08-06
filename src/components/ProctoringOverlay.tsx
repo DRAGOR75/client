@@ -1,6 +1,7 @@
+"use client";
 import React from 'react';
 import { useProctoring } from '../hooks/useProctoring';
-import { AlertTriangle, Video, VideoOff } from 'lucide-react';
+import { AlertTriangle, VideoOff } from 'lucide-react';
 
 export const ProctoringOverlay: React.FC = () => {
   const { videoRef, canvasRef, isModelLoaded, cameraError, warningMessage } = useProctoring();

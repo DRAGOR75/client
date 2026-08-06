@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from 'react';
 import { useTest } from '../context/TestContext';
 import { ShieldAlert, Award, Loader2, User } from 'lucide-react';

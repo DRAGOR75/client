@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { FaceLandmarker, FilesetResolver, DrawingUtils } from '@mediapipe/tasks-vision';
 import { useTest } from '../context/TestContext';

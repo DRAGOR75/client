@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import { Database, FileText, CheckCircle2, XCircle, Info, Upload, Trash2, ArrowLeft } from 'lucide-react';
 
@@ -27,7 +28,7 @@ export const TestImporter: React.FC = () => {
       .catch(() => setDbConnected(false));
   }, []);
 
-  const loadTemplate = (format: 'full' | 'varc' | 'dilr' | 'qa') => {
+  const loadTemplate = (format: 'full' | 'varc' | 'dilr' | 'qa' | 'corp') => {
     const templates: Record<string, object> = {
       full: {
         test: { id: "mock-cat-full", title: "All-India Mock CAT 2026 - Full Paper", description: "Complete 120-min, 3-section mock.", durationMinutes: 120 },
@@ -64,6 +65,12 @@ export const TestImporter: React.FC = () => {
         questions: [
           { id: "sq-1", section_id: "sec-qa-s", text: "A cistern has two pipes. Pipe A fills it in 12 min, Pipe B empties it in 18 min. If both open together when empty, how long to fill?", points: 3, order: 1, options: [{ id: "sq-1a", text: "36 minutes" }, { id: "sq-1b", text: "30 minutes" }, { id: "sq-1c", text: "24 minutes" }], correct_option_id: "sq-1a" },
           { id: "sq-2", section_id: "sec-qa-s", text: "If log₂(x) + log₂(x-2) = 3, find the value of x.", points: 3, order: 2, options: [{ id: "sq-2a", text: "4" }, { id: "sq-2b", text: "8" }, { id: "sq-2c", text: "6" }], correct_option_id: "sq-2a" }
+      },
+      corp: {
+        test: { id: "corp-sec-2026", title: "Annual Information Security Awareness", description: "Corporate mandatory compliance training.", durationMinutes: 60, type: "corporate_compliance", passingPercentage: 80 },
+        sections: [{ id: "sec-core", testId: "corp-sec-2026", name: "Core Security", orderIndex: 0, durationMinutes: 60 }],
+        questions: [
+          { id: "q-phishing-1", section_id: "sec-core", text: "Which of the following is a primary indicator of a phishing email?", points: 5, order: 1, options: [{ id: "opt-1a", text: "Urgent language demanding immediate action." }, { id: "opt-1b", text: "Personalized greeting with your full name." }], correct_option_id: "opt-1a" }
         ]
       }
     };
@@ -95,6 +102,12 @@ export const TestImporter: React.FC = () => {
         if (!parsed.test.title) errors.push({ type: 'error', message: 'Test metadata object is missing a "title".' });
         if (typeof parsed.test.durationMinutes !== 'number') {
           errors.push({ type: 'error', message: 'Test durationMinutes must be a valid integer.' });
+        }
+        if (parsed.test.type !== undefined && typeof parsed.test.type !== 'string') {
+          errors.push({ type: 'error', message: 'Test type must be a valid string.' });
+        }
+        if (parsed.test.passingPercentage !== undefined && typeof parsed.test.passingPercentage !== 'number') {
+          errors.push({ type: 'error', message: 'Test passingPercentage must be a valid numerical integer.' });
         }
       }
 
@@ -237,7 +250,7 @@ export const TestImporter: React.FC = () => {
             </div>
 
             <button
-              onClick={() => { window.location.hash = ''; }}
+              onClick={() => { window.location.href = '/'; }}
               className="flex items-center gap-1 bg-white hover:bg-gray-50 border border-gray-300 px-4 py-2 rounded text-xs font-bold font-sans uppercase text-gray-700 transition shadow-sm cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -262,6 +275,7 @@ export const TestImporter: React.FC = () => {
                 <button onClick={() => loadTemplate('varc')} className="bg-amber-500 hover:bg-amber-600 border border-amber-600 text-white px-2.5 py-1 rounded text-[10px] font-bold uppercase transition">VARC (40m)</button>
                 <button onClick={() => loadTemplate('dilr')} className="bg-purple-600 hover:bg-purple-700 border border-purple-700 text-white px-2.5 py-1 rounded text-[10px] font-bold uppercase transition">DILR (40m)</button>
                 <button onClick={() => loadTemplate('qa')} className="bg-teal-600 hover:bg-teal-700 border border-teal-700 text-white px-2.5 py-1 rounded text-[10px] font-bold uppercase transition">QA (40m)</button>
+                <button onClick={() => loadTemplate('corp')} className="bg-indigo-600 hover:bg-indigo-700 border border-indigo-700 text-white px-2.5 py-1 rounded text-[10px] font-bold uppercase transition">Corporate (60m)</button>
                 <button
                   onClick={() => { setJsonText(''); setValidationErrors([]); setValidationPassed(false); setImportStatus(null); }}
                   className="bg-white hover:bg-gray-100 border border-gray-300 text-red-600 px-2 py-1 rounded text-[10px] font-bold uppercase transition"
@@ -339,7 +353,7 @@ export const TestImporter: React.FC = () => {
                       if (!testId) return;
                       await fetch(`http://localhost:8080/api/tests/${testId}/launch`, { method: 'POST' });
                       localStorage.setItem('activeTestId', testId);
-                      window.location.hash = '';
+                      window.location.href = '/';
                     } catch { /* ignore */ }
                   }}
                   className="w-full flex items-center justify-center gap-2 rounded py-3 text-xs font-bold uppercase tracking-wider border shadow transition-all bg-[#1F70C1] hover:bg-[#1a5fa6] border-[#1a5fa6] text-white cursor-pointer"
@@ -381,7 +395,7 @@ export const TestImporter: React.FC = () => {
                     Awaiting Validation Check
                   </span>
                   <p className="text-[10px] text-gray-400 font-medium uppercase mt-1 font-mono leading-relaxed">
-                    Paste your paper schema in the editor and click "Validate Schema" to start auditing properties.
+                    Paste your paper schema in the editor and click &quot;Validate Schema&quot; to start auditing properties.
                   </p>
                 </div>
               )}
