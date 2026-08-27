@@ -35,7 +35,7 @@ export const TestImporter: React.FC = () => {
         sections: [
           { id: "sec-varc", testId: "mock-cat-full", name: "VARC", orderIndex: 0, durationMinutes: 40 },
           { id: "sec-dilr", testId: "mock-cat-full", name: "DILR", orderIndex: 1, durationMinutes: 40 },
-          { id: "sec-qa",   testId: "mock-cat-full", name: "QA",   orderIndex: 2, durationMinutes: 40 }
+          { id: "sec-qa", testId: "mock-cat-full", name: "QA", orderIndex: 2, durationMinutes: 40 }
         ],
         questions: [
           { id: "qf-v1", section_id: "sec-varc", text: "[Reading Passage]\n\nThe digital era has introduced a profound fragmentation of human attention...\n\nQuestion:\nThe author most likely views hyperlinks as:", points: 3, order: 1, options: [{ id: "of-v1a", text: "A democratization tool." }, { id: "of-v1b", text: "A cognitive tax impairing retention." }, { id: "of-v1c", text: "An irrelevant construct." }], correct_option_id: "of-v1b" },
@@ -57,21 +57,6 @@ export const TestImporter: React.FC = () => {
         questions: [
           { id: "sd-1", section_id: "sec-dilr-s", text: "[Data Set: Sales Performance]\n\nA company tracks Q1-Q4 revenue across 4 regions...\nNorth: 120, 150, 130, 160\nSouth: 90, 110, 100, 140\n\nQuestion:\nWhich region showed the highest percentage growth from Q1 to Q4?", points: 3, order: 1, options: [{ id: "sd-1a", text: "North (33%)" }, { id: "sd-1b", text: "South (56%)" }, { id: "sd-1c", text: "Both equal" }], correct_option_id: "sd-1b" },
           { id: "sd-2", section_id: "sec-dilr-s", text: "[Logical Puzzle]\n\nFive people sit in a row. A is not adjacent to B. C sits at one end. D is between A and E.\n\nQuestion:\nWho sits in the middle?", points: 3, order: 2, options: [{ id: "sd-2a", text: "A" }, { id: "sd-2b", text: "D" }, { id: "sd-2c", text: "E" }], correct_option_id: "sd-2b" }
-        ]
-      },
-      qa: {
-        test: { id: "sectional-qa", title: "Sectional Test — QA (40 min)", description: "Quantitative Ability sectional practice.", durationMinutes: 40 },
-        sections: [{ id: "sec-qa-s", testId: "sectional-qa", name: "QA", orderIndex: 0, durationMinutes: 40 }],
-        questions: [
-          { id: "sq-1", section_id: "sec-qa-s", text: "A cistern has two pipes. Pipe A fills it in 12 min, Pipe B empties it in 18 min. If both open together when empty, how long to fill?", points: 3, order: 1, options: [{ id: "sq-1a", text: "36 minutes" }, { id: "sq-1b", text: "30 minutes" }, { id: "sq-1c", text: "24 minutes" }], correct_option_id: "sq-1a" },
-          { id: "sq-2", section_id: "sec-qa-s", text: "If log₂(x) + log₂(x-2) = 3, find the value of x.", points: 3, order: 2, options: [{ id: "sq-2a", text: "4" }, { id: "sq-2b", text: "8" }, { id: "sq-2c", text: "6" }], correct_option_id: "sq-2a" }
-      },
-      corp: {
-        test: { id: "corp-sec-2026", title: "Annual Information Security Awareness", description: "Corporate mandatory compliance training.", durationMinutes: 60, type: "corporate_compliance", passingPercentage: 80 },
-        sections: [{ id: "sec-core", testId: "corp-sec-2026", name: "Core Security", orderIndex: 0, durationMinutes: 60 }],
-        questions: [
-          { id: "q-phishing-1", section_id: "sec-core", text: "Which of the following is a primary indicator of a phishing email?", points: 5, order: 1, options: [{ id: "opt-1a", text: "Urgent language demanding immediate action." }, { id: "opt-1b", text: "Personalized greeting with your full name." }], correct_option_id: "opt-1a" }
-        ]
       }
     };
     setJsonText(JSON.stringify(templates[format], null, 2));
@@ -221,7 +206,7 @@ export const TestImporter: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F5F7FA] font-sans antialiased text-gray-800 p-6 flex justify-center">
       <div className="w-full max-w-5xl flex flex-col gap-6">
-        
+
         {/* Header Ribbon bar */}
         <div className="flex items-center justify-between border-b border-gray-300 pb-4">
           <div className="flex items-center gap-3">
@@ -233,19 +218,17 @@ export const TestImporter: React.FC = () => {
               <p className="text-xs text-gray-500 font-medium font-mono">ADMIN CONTROL BOARD • DYNAMIC TEST INJECTION</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3">
             {/* Database connectivity status pill */}
-            <div className={`px-3 py-1.5 rounded-full border text-[11px] font-mono font-bold flex items-center gap-1.5 shadow-sm ${
-              dbConnected === true
+            <div className={`px-3 py-1.5 rounded-full border text-[11px] font-mono font-bold flex items-center gap-1.5 shadow-sm ${dbConnected === true
                 ? 'bg-emerald-50 border-emerald-300 text-emerald-700 animate-pulse'
                 : dbConnected === false
-                ? 'bg-red-50 border-red-300 text-red-750'
-                : 'bg-gray-100 border-gray-300 text-gray-500'
-            }`}>
-              <span className={`w-2.5 h-2.5 rounded-full ${
-                dbConnected === true ? 'bg-emerald-600' : dbConnected === false ? 'bg-red-650' : 'bg-gray-400'
-              }`} />
+                  ? 'bg-red-50 border-red-300 text-red-750'
+                  : 'bg-gray-100 border-gray-300 text-gray-500'
+              }`}>
+              <span className={`w-2.5 h-2.5 rounded-full ${dbConnected === true ? 'bg-emerald-600' : dbConnected === false ? 'bg-red-650' : 'bg-gray-400'
+                }`} />
               <span>{dbConnected === true ? 'GO_REST_CONNECTED' : dbConnected === false ? 'GO_REST_DISCONNECTED' : 'CHECKING_API'}</span>
             </div>
 
@@ -261,10 +244,10 @@ export const TestImporter: React.FC = () => {
 
         {/* Dashboard Main Grid Split */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
+
           {/* Left Column: Editor pane */}
           <div className="lg:col-span-2 flex flex-col border border-gray-300 rounded bg-white shadow-sm overflow-hidden h-[620px]">
-            
+
             <div className="bg-[#E5ECF4] border-b border-gray-300 px-4 py-2.5 flex items-center justify-between">
               <span className="text-[11px] font-extrabold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
                 <FileText className="w-4 h-4 text-[#1F70C1]" />
@@ -296,7 +279,7 @@ export const TestImporter: React.FC = () => {
 
           {/* Right Column: Validation checklists and controls */}
           <div className="lg:col-span-1 flex flex-col gap-6">
-            
+
             {/* Control Panel panel */}
             <div className="border border-gray-300 rounded bg-white shadow-sm p-4 flex flex-col gap-4">
               <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200 pb-2">
@@ -314,11 +297,10 @@ export const TestImporter: React.FC = () => {
                 <button
                   onClick={handleImport}
                   disabled={!validationPassed || isSubmitting || dbConnected === false}
-                  className={`w-full flex items-center justify-center gap-2 rounded py-3 text-xs font-bold uppercase tracking-wider border shadow transition-all ${
-                    !validationPassed || dbConnected === false
+                  className={`w-full flex items-center justify-center gap-2 rounded py-3 text-xs font-bold uppercase tracking-wider border shadow transition-all ${!validationPassed || dbConnected === false
                       ? 'bg-gray-100 border-gray-205 text-gray-400 cursor-not-allowed opacity-60'
                       : 'bg-[#5CB85C] hover:bg-[#4cae4c] border-[#4cae4c] text-white cursor-pointer'
-                  }`}
+                    }`}
                 >
                   <Upload className="w-4 h-4" />
                   <span>{isSubmitting ? 'Uploading...' : 'Publish Test Paper'}</span>
@@ -327,11 +309,10 @@ export const TestImporter: React.FC = () => {
 
               {/* Status Alert displays */}
               {importStatus && (
-                <div className={`p-4 rounded border text-xs font-mono font-medium leading-relaxed uppercase ${
-                  importStatus.success
+                <div className={`p-4 rounded border text-xs font-mono font-medium leading-relaxed uppercase ${importStatus.success
                     ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
                     : 'bg-red-50 border-red-300 text-red-700'
-                }`}>
+                  }`}>
                   <div className="flex gap-2 items-start">
                     {importStatus.success ? (
                       <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
