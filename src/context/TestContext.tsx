@@ -45,7 +45,7 @@ interface TestContextType {
 
   // Navigation & Actions
   setCurrentQuestionIndex: (index: number) => void;
-  selectOption: (questionId: string, optionId: string) => void;
+  selectOption: (questionId: string, optionId: string | string[]) => void;
   clearSelection: (questionId: string) => void;
   toggleMarkForReview: (questionId: string) => void;
   submitAttempt: (isAutoSubmit?: boolean) => Promise<void>;
@@ -365,7 +365,7 @@ export const TestProvider: React.FC<{
     }
   };
 
-  const selectOption = (questionId: string, optionId: string) => {
+  const selectOption = (questionId: string, optionId: string | string[]) => {
     if (connectionLost || isWaiting) return;
     
     setAnswers((prev) => ({
@@ -374,11 +374,16 @@ export const TestProvider: React.FC<{
     }));
 
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({
-        type: 'ANSWER',
-        question_id: questionId,
-        option_id: optionId
-      }));
+      const q = payload?.questions.find(q => q.id === questionId);
+      let msg: any = { type: 'ANSWER', question_id: questionId };
+      if (Array.isArray(optionId)) {
+        msg.option_ids = optionId;
+      } else if (q?.type === 'TITA') {
+        msg.text_response = optionId;
+      } else {
+        msg.option_id = optionId;
+      }
+      wsRef.current.send(JSON.stringify(msg));
     }
   };
 

@@ -57,6 +57,7 @@ export const TestImporter: React.FC = () => {
         questions: [
           { id: "sd-1", section_id: "sec-dilr-s", text: "[Data Set: Sales Performance]\n\nA company tracks Q1-Q4 revenue across 4 regions...\nNorth: 120, 150, 130, 160\nSouth: 90, 110, 100, 140\n\nQuestion:\nWhich region showed the highest percentage growth from Q1 to Q4?", points: 3, order: 1, options: [{ id: "sd-1a", text: "North (33%)" }, { id: "sd-1b", text: "South (56%)" }, { id: "sd-1c", text: "Both equal" }], correct_option_id: "sd-1b" },
           { id: "sd-2", section_id: "sec-dilr-s", text: "[Logical Puzzle]\n\nFive people sit in a row. A is not adjacent to B. C sits at one end. D is between A and E.\n\nQuestion:\nWho sits in the middle?", points: 3, order: 2, options: [{ id: "sd-2a", text: "A" }, { id: "sd-2b", text: "D" }, { id: "sd-2c", text: "E" }], correct_option_id: "sd-2b" }
+        ]
       }
     };
     setJsonText(JSON.stringify(templates[format], null, 2));
@@ -133,23 +134,37 @@ export const TestImporter: React.FC = () => {
           if (typeof q.points !== 'number') {
             errors.push({ type: 'error', message: `${qLabel} points value must be a numerical integer.` });
           }
+          if (q.type && !['MCQ', 'MSQ', 'TITA'].includes(q.type)) {
+            errors.push({ type: 'error', message: `${qLabel} type must be MCQ, MSQ, or TITA.` });
+          }
 
-          if (!q.options || !Array.isArray(q.options) || q.options.length < 2) {
-            errors.push({ type: 'error', message: `${qLabel} must contain a list of at least 2 multiple-choice "options".` });
-          } else {
-            const optionIds = q.options.map((o: any) => o.id);
-            q.options.forEach((opt: any, optIdx: number) => {
-              if (!opt.id) errors.push({ type: 'error', message: `${qLabel} option [${optIdx}] is missing an "id".` });
-              if (!opt.text) errors.push({ type: 'error', message: `${qLabel} option [${optIdx}] has empty text.` });
-            });
-
-            if (!q.correct_option_id) {
-              errors.push({ type: 'error', message: `${qLabel} is missing the "correct_option_id".` });
-            } else if (!optionIds.includes(q.correct_option_id)) {
-              errors.push({
-                type: 'error',
-                message: `${qLabel} correct_option_id "${q.correct_option_id}" does not match any available option IDs.`,
+          if (q.type !== 'TITA') {
+            if (!q.options || !Array.isArray(q.options) || q.options.length < 2) {
+              errors.push({ type: 'error', message: `${qLabel} must contain a list of at least 2 multiple-choice "options".` });
+            } else {
+              const optionIds = q.options.map((o: any) => o.id);
+              q.options.forEach((opt: any, optIdx: number) => {
+                if (!opt.id) errors.push({ type: 'error', message: `${qLabel} option [${optIdx}] is missing an "id".` });
+                if (!opt.text) errors.push({ type: 'error', message: `${qLabel} option [${optIdx}] has empty text.` });
               });
+
+              if (!q.correct_option_id) {
+                errors.push({ type: 'error', message: `${qLabel} is missing the "correct_option_id".` });
+              } else {
+                const correctIds = q.correct_option_id.split(',').map((id: string) => id.trim());
+                correctIds.forEach((cid: string) => {
+                  if (!optionIds.includes(cid)) {
+                    errors.push({
+                      type: 'error',
+                      message: `${qLabel} correct_option_id "${cid}" does not match any available option IDs.`,
+                    });
+                  }
+                });
+              }
+            }
+          } else {
+            if (!q.correct_option_id) {
+              errors.push({ type: 'error', message: `${qLabel} is TITA but missing the correct answer text in "correct_option_id".` });
             }
           }
         });

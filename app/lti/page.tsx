@@ -63,7 +63,7 @@ export default function LTIConfigPage() {
 
         <div className="bg-blue-50 border border-blue-200 rounded shadow-sm p-5 text-sm text-blue-800">
           <p className="font-bold mb-1">Custom Parameters</p>
-          <p className="mb-2">To link a specific corporate test to a Moodle course, add this to the "Custom parameters" box in Moodle:</p>
+          <p className="mb-2">To link a specific corporate test to a Moodle course, add this to the &quot;Custom parameters&quot; box in Moodle:</p>
           <code className="block bg-blue-100/50 p-2 rounded text-xs font-mono border border-blue-200">
             test_id=corp-sec-2026
           </code>

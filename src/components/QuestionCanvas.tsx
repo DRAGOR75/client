@@ -20,7 +20,7 @@ export const QuestionCanvas: React.FC = () => {
     activeSection,
   } = useTest();
 
-  const [localSelectedOption, setLocalSelectedOption] = useState<string | null>(null);
+  const [localSelectedOption, setLocalSelectedOption] = useState<string | string[] | null>(null);
 
   const currentQuestion = payload?.questions?.[currentQuestionIndex];
 
@@ -63,9 +63,17 @@ export const QuestionCanvas: React.FC = () => {
 
       // Option selection hotkeys (a, b, c, d)
       const optionIndex = key.charCodeAt(0) - 97; // 'a' = 0, 'b' = 1, etc.
-      if (optionIndex >= 0 && optionIndex < currentQuestion.options.length && key.length === 1) {
+      if (optionIndex >= 0 && optionIndex < currentQuestion.options.length && key.length === 1 && currentQuestion.type !== 'TITA') {
         e.preventDefault();
-        setLocalSelectedOption(currentQuestion.options[optionIndex].id);
+        const optId = currentQuestion.options[optionIndex].id;
+        if (currentQuestion.type === 'MSQ') {
+          setLocalSelectedOption(prev => {
+            const arr = Array.isArray(prev) ? prev : [];
+            return arr.includes(optId) ? arr.filter(id => id !== optId) : [...arr, optId];
+          });
+        } else {
+          setLocalSelectedOption(optId);
+        }
       }
     };
 
@@ -192,17 +200,46 @@ export const QuestionCanvas: React.FC = () => {
 
           {/* Option Stack */}
           <div className="flex flex-col gap-2.5 mt-2">
-            {currentQuestion.options.map((option, idx) => (
-              <OptionCard
-                key={option.id}
-                id={option.id}
-                text={option.text}
-                letter={letters[idx] || '?'}
-                isSelected={localSelectedOption === option.id}
-                onSelect={() => !isCompleted && !connectionLost && !isWaiting && setLocalSelectedOption(option.id)}
+            {currentQuestion.type === 'TITA' ? (
+              <textarea 
+                className="w-full p-3 border rounded text-sm bg-white border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1F70C1]"
+                placeholder="Type your answer here..."
+                value={(localSelectedOption as string) || ''}
+                onChange={(e) => setLocalSelectedOption(e.target.value)}
                 disabled={isCompleted || connectionLost || isWaiting}
+                rows={4}
               />
-            ))}
+            ) : (
+              currentQuestion.options.map((option, idx) => {
+                const isSelected = Array.isArray(localSelectedOption) 
+                  ? localSelectedOption.includes(option.id) 
+                  : localSelectedOption === option.id;
+                  
+                return (
+                  <OptionCard
+                    key={option.id}
+                    id={option.id}
+                    text={option.text}
+                    letter={letters[idx] || '?'}
+                    isSelected={isSelected}
+                    onSelect={() => {
+                      if (isCompleted || connectionLost || isWaiting) return;
+                      if (currentQuestion.type === 'MSQ') {
+                        setLocalSelectedOption(prev => {
+                          const arr = Array.isArray(prev) ? prev : [];
+                          return arr.includes(option.id) 
+                            ? arr.filter(id => id !== option.id) 
+                            : [...arr, option.id];
+                        });
+                      } else {
+                        setLocalSelectedOption(option.id);
+                      }
+                    }}
+                    disabled={isCompleted || connectionLost || isWaiting}
+                  />
+                );
+              })
+            )}
           </div>
 
         </div>

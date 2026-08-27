@@ -26,7 +26,8 @@ const TestAttemptMainLayout: React.FC = () => {
 
   // Anti-Cheat 1: Fullscreen lock triggers and changes
   useEffect(() => {
-    if (isWaiting || isCompleted || !payload) return;
+    const isCAT = !payload?.test.type || payload.test.type === 'cat' || payload.test.type === 'standard';
+    if (isWaiting || isCompleted || !payload || !isCAT) return;
 
     const requestFullscreenMode = async () => {
       try {
@@ -57,7 +58,8 @@ const TestAttemptMainLayout: React.FC = () => {
 
   // Anti-Cheat 2: Tab Visibility shift tracking
   useEffect(() => {
-    if (isWaiting || isCompleted || !payload) return;
+    const isCAT = !payload?.test.type || payload.test.type === 'cat' || payload.test.type === 'standard';
+    if (isWaiting || isCompleted || !payload || !isCAT) return;
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
@@ -72,6 +74,8 @@ const TestAttemptMainLayout: React.FC = () => {
 
   // Anti-Cheat 3: Global hotkey lockouts (Copy, Paste, Print, Context menu)
   useEffect(() => {
+    const isCAT = !payload?.test.type || payload.test.type === 'cat' || payload.test.type === 'standard';
+    if (!payload || !isCAT) return;
     const blockKeys = (e: KeyboardEvent) => {
       const isCtrl = e.ctrlKey || e.metaKey;
       if (isCtrl && (e.key === 'c' || e.key === 'v' || e.key === 'p')) {
@@ -93,7 +97,7 @@ const TestAttemptMainLayout: React.FC = () => {
       document.removeEventListener('keydown', blockKeys);
       document.removeEventListener('contextmenu', blockContextMenu);
     };
-  }, []);
+  }, [payload]);
 
   // 1. Sleek, clinical loading spinner
   if (isLoading) {
